@@ -1,0 +1,20 @@
+import { pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core"
+
+export const membershipEnum = pgEnum("membership", ["free", "pro"])
+
+export const profilesTable = pgTable("profiles", {
+  userId: text("user_id").primaryKey().notNull(),
+  membership: membershipEnum("membership").notNull().default("free"),
+
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+
+  created_at: timestamp("created_at").notNull().defaultNow(),
+  updated_at: timestamp("updated_at")
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+})
+
+export type InsertProfile = typeof profilesTable.$inferInsert
+export type SelectProfile = typeof profilesTable.$inferSelect
