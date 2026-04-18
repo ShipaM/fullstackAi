@@ -116,7 +116,7 @@ export default function Pricing() {
             <div className="flex items-center gap-8">
               <button
                 onClick={() => setIsAnnual(false)}
-                className={`text-sm font-medium transition-colors ${
+                className={`cursor-pointer text-sm font-medium transition-colors ${
                   !isAnnual ? "text-black" : "text-zinc-400 hover:text-zinc-500"
                 }`}
               >
@@ -139,7 +139,7 @@ export default function Pricing() {
               </div>
               <button
                 onClick={() => setIsAnnual(true)}
-                className={`text-sm font-medium transition-colors ${
+                className={`cursor-pointer text-sm font-medium transition-colors ${
                   isAnnual ? "text-black" : "text-zinc-400 hover:text-zinc-500"
                 }`}
               >
@@ -207,7 +207,7 @@ export default function Pricing() {
                   ))}
                 </ul>
                 <Button
-                  className={`w-full ${
+                  className={`w-full cursor-pointer ${
                     plan.popular
                       ? "bg-black text-white hover:bg-black/90"
                       : "bg-white hover:bg-zinc-50"

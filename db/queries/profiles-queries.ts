@@ -24,7 +24,7 @@ export const getProfileByUserId = async (userId: string) => {
   }
 }
 
-export const updateProfile = async (
+export const updateProfileByUserId = async (
   userId: string,
   data: Partial<InsertProfile>
 ) => {
@@ -47,5 +47,22 @@ export const deleteProfile = async (userId: string) => {
   } catch (error) {
     console.log("Error deleting profile", error)
     throw new Error("Failed to delete profile")
+  }
+}
+
+export const updateProfileByStripeCustomerId = async (
+  stripeCustomerId: string,
+  data: Partial<InsertProfile>
+) => {
+  try {
+    const [updatedProfile] = await db
+      .update(profilesTable)
+      .set(data)
+      .where(eq(profilesTable.stripeCustomerId, stripeCustomerId))
+      .returning()
+    return updatedProfile
+  } catch (error) {
+    console.error("Error updating profile by stripe customer id", error)
+    throw new Error("Failed to update profile by stripe customer id")
   }
 }

@@ -45,7 +45,7 @@ export default function Header() {
               <Link
                 key={item}
                 href={`#${item.toLowerCase()}`}
-                className="text-[13px] font-medium text-black/60 transition-colors hover:text-black"
+                className="cursor-pointer text-[13px] font-medium text-black/60 transition-colors hover:text-black"
               >
                 {item}
               </Link>
@@ -56,13 +56,13 @@ export default function Header() {
           <Button
             variant="ghost"
             size="sm"
-            className="text-[13px] font-medium text-black/60 hover:bg-zinc-100/50 hover:text-black"
+            className="cursor-pointer text-[13px] font-medium text-black/60 hover:bg-zinc-100/50 hover:text-black"
           >
             Sign in
           </Button>
           <Button
             size="sm"
-            className="rounded-full bg-black px-4 text-[13px] font-medium text-white hover:bg-black/90"
+            className="cursor-pointer rounded-full bg-black px-4 text-[13px] font-medium text-white hover:bg-black/90"
           >
             Get Started
           </Button>
