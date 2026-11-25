@@ -3,7 +3,7 @@ import Stripe from "stripe"
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   // Создаём экземпляр клиента Stripe, используя секретный ключ из переменных окружения
-  apiVersion: "2026-03-25.dahlia",
+  apiVersion: "2026-11-18.endive",
   // Указываем версию API Stripe, чтобы быть уверенными, что функциональность соответствует ожидаемой версии API
   appInfo: {
     name: "Todo App",
