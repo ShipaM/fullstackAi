@@ -70,6 +70,26 @@ const plans: Plan[] = [
   },
 ]
 
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+}
+
+const item = {
+  hidden: { opacity: 0, y: 40, scale: 0.96 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.5, ease: "easeOut" as const },
+  },
+}
+
 export default function Pricing() {
   const [isAnnual, setIsAnnual] = useState(false)
   const { user } = useUser()
@@ -166,64 +186,65 @@ export default function Pricing() {
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3 }}
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
           className="mx-auto mt-16 grid max-w-5xl gap-8 md:grid-cols-3"
         >
           {plans.map((plan) => (
-            <Card
-              key={plan.name}
-              className={`relative flex flex-col overflow-hidden rounded-3xl border border-border p-8 transition-all duration-300 hover:border-foreground/20 ${
-                plan.popular ? "border-2 border-primary shadow-lg" : ""
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute top-7 -right-20 z-10 rotate-45 bg-primary px-24 py-1 text-center text-sm font-medium text-primary-foreground shadow-sm">
-                  Popular
-                </div>
-              )}
-              <div className="space-y-2">
-                <h3 className="text-2xl font-semibold">{plan.name}</h3>
-                <p className="text-base text-muted-foreground">
-                  {plan.description}
-                </p>
-                <div className="pt-4">
-                  <span className="text-5xl font-bold tracking-tight">
-                    {isAnnual ? plan.price.annually : plan.price.monthly}
-                  </span>
-                  {plan.name !== "Enterprise" && (
-                    <span className="ml-1 text-base font-normal text-muted-foreground">
-                      /{isAnnual ? "year" : "month"}
+            <motion.div key={plan.name} variants={item}>
+              <Card
+                className={`relative flex h-full flex-col overflow-hidden rounded-3xl border border-border p-8 transition-all duration-300 hover:border-foreground/20 ${
+                  plan.popular ? "border-2 border-primary shadow-lg" : ""
+                }`}
+              >
+                {plan.popular && (
+                  <div className="absolute top-7 -right-20 z-10 rotate-45 bg-primary px-24 py-1 text-center text-sm font-medium text-primary-foreground shadow-sm">
+                    Popular
+                  </div>
+                )}
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-semibold">{plan.name}</h3>
+                  <p className="text-base text-muted-foreground">
+                    {plan.description}
+                  </p>
+                  <div className="pt-4">
+                    <span className="text-5xl font-bold tracking-tight">
+                      {isAnnual ? plan.price.annually : plan.price.monthly}
                     </span>
-                  )}
+                    {plan.name !== "Enterprise" && (
+                      <span className="ml-1 text-base font-normal text-muted-foreground">
+                        /{isAnnual ? "year" : "month"}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex flex-1 flex-col gap-4 pt-8">
-                <ul className="flex flex-1 flex-col gap-4">
-                  {plan.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className="flex items-start gap-2 text-sm"
-                    >
-                      <Check className="h-5 w-5 shrink-0 text-emerald-500" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  className="w-full cursor-pointer"
-                  variant={plan.popular ? "default" : "outline"}
-                  onClick={
-                    plan.name === "Pro" ? handleProSubscription : undefined
-                  }
-                >
-                  {plan.cta}
-                </Button>
-              </div>
-            </Card>
+                <div className="flex flex-1 flex-col gap-4 pt-8">
+                  <ul className="flex flex-1 flex-col gap-4">
+                    {plan.features.map((feature) => (
+                      <li
+                        key={feature}
+                        className="flex items-start gap-2 text-sm"
+                      >
+                        <Check className="h-5 w-5 shrink-0 text-emerald-500" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button
+                    className="w-full cursor-pointer"
+                    variant={plan.popular ? "default" : "outline"}
+                    onClick={
+                      plan.name === "Pro" ? handleProSubscription : undefined
+                    }
+                  >
+                    {plan.cta}
+                  </Button>
+                </div>
+              </Card>
+            </motion.div>
           ))}
         </motion.div>
       </div>

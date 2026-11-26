@@ -38,7 +38,8 @@ export default function Hero() {
     queueMicrotask(() => setMounted(true))
   }, [])
 
-  if (!mounted) return null
+  // Reserve hero height before mount so sections below don't start in view
+  if (!mounted) return <section id="hero" className="h-screen" />
 
   if (!user) {
     return (
