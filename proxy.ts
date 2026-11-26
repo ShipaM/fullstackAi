@@ -1,18 +1,14 @@
-import { NextResponse } from "next/server"
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server"
+import { clerkMiddleware } from "@clerk/nextjs/server"
 
-const isProtectedRoute = createRouteMatcher(["/chat(.*)"])
-
-export default clerkMiddleware(async (auth, req) => {
-  const { userId, redirectToSignIn } = await auth()
-
-  if (!userId && isProtectedRoute(req)) {
-    return redirectToSignIn({ returnBackUrl: "/login" })
-  }
-
-  return NextResponse.next()
-})
+// Auth checks live in each protected page / layout / route handler / server action
+// via `await auth.protect()`. clerkMiddleware() is still required for Clerk to work.
+export default clerkMiddleware()
 
 export const config = {
-  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/(api|trpc)(.*)"],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // Always run for API routes
+    "/(api|trpc)(.*)",
+  ],
 }

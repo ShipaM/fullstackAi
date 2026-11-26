@@ -33,7 +33,9 @@ export default async function RootLayout({
     }
   }
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{ options: { unsafe_disableDevelopmentModeWarnings: true } }}
+    >
       <html
         lang="en"
         suppressHydrationWarning
