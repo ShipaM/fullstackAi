@@ -1,12 +1,5 @@
-import { auth } from "@clerk/nextjs/server"
+import ChatMessages from "./components/chat-messages/chat-messages"
 
-export default async function ChatPage() {
-  const { userId } = await auth.protect()
-
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-2 p-4 text-center">
-      <h1 className="text-2xl font-semibold">Chat</h1>
-      <p className="text-muted-foreground">Coming soon. Signed in as {userId}</p>
-    </div>
-  )
+export default function ChatPage() {
+  return <ChatMessages messages={[]} />
 }
