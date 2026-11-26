@@ -13,7 +13,9 @@ export async function createProfileAction(
 ): Promise<ActionState<SelectProfile>> {
   try {
     const newProfile = await createProfile(data)
+
     revalidatePath("/")
+
     return {
       isSuccess: true,
       message: "Profile created successfully",
@@ -21,6 +23,7 @@ export async function createProfileAction(
     }
   } catch (error) {
     console.error("Error creating profile", error)
+
     return { isSuccess: false, message: "Failed to create profile" }
   }
 }
@@ -30,6 +33,7 @@ export async function getProfileByUserIdAction(
 ): Promise<ActionState<SelectProfile>> {
   try {
     const profile = await getProfileByUserId(userId)
+
     return {
       isSuccess: true,
       message: "Profile fetched successfully",
@@ -37,6 +41,7 @@ export async function getProfileByUserIdAction(
     }
   } catch (error) {
     console.error("Error getting profile by user id", error)
+
     return { isSuccess: false, message: "Failed to get profile" }
   }
 }

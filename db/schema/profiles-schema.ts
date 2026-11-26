@@ -9,8 +9,8 @@ export const profilesTable = pgTable("profiles", {
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
 
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at")
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
