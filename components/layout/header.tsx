@@ -1,5 +1,6 @@
 "use client"
 
+import ThemeToggle from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { SignOutButton, useUser } from "@clerk/nextjs"
 import { motion, useScroll } from "framer-motion"
@@ -26,19 +27,25 @@ export default function Header() {
     return () => unsubscribe()
   }, [scrollY])
 
-  if (!isVisible) return null
+  if (!isVisible) {
+    return (
+      <div className="fixed top-3 right-4 z-50">
+        <ThemeToggle />
+      </div>
+    )
+  }
 
   return (
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className="fixed top-0 z-50 w-full border-b border-zinc-200/50 bg-white/60 backdrop-blur-xl supports-backdrop-filter:bg-white/30"
+      className="fixed top-0 z-50 w-full border-b border-border/50 bg-background/60 backdrop-blur-xl supports-backdrop-filter:bg-background/30"
     >
       <div className="mx-auto flex h-12 max-w-3xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-8">
           <Link
             href="/"
-            className="text-sm font-medium tracking-tight text-black/80 hover:text-black"
+            className="text-sm font-medium tracking-tight text-foreground/80 hover:text-foreground"
           >
             AI
           </Link>
@@ -47,7 +54,7 @@ export default function Header() {
               <Link
                 key={item}
                 href={`#${item.toLowerCase()}`}
-                className="cursor-pointer text-[13px] font-medium text-black/60 transition-colors hover:text-black"
+                className="cursor-pointer text-[13px] font-medium text-foreground/60 transition-colors hover:text-foreground"
               >
                 {item}
               </Link>
@@ -60,12 +67,13 @@ export default function Header() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="cursor-pointer text-[13px] font-medium text-black/60 hover:bg-zinc-100/50 hover:text-black"
+                className="cursor-pointer text-[13px] font-medium text-foreground/60 hover:bg-accent/50 hover:text-foreground"
               >
                 Logout
               </Button>
             </SignOutButton>
           )}
+          <ThemeToggle />
         </div>
       </div>
     </motion.header>

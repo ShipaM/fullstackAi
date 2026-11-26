@@ -58,7 +58,7 @@ export default function Features() {
   return (
     <section
       id="features"
-      className="relative overflow-hidden bg-zinc-50 py-24"
+      className="relative overflow-hidden bg-muted/50 py-24"
     >
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -96,7 +96,7 @@ export default function Features() {
                 className={`relative h-full overflow-hidden border-0 bg-linear-to-br ${feature.gradient} p-8 transition-all duration-300`}
               >
                 <div className="space-y-4">
-                  <feature.icon className="h-12 w-12 text-zinc-900" />
+                  <feature.icon className="h-12 w-12 text-foreground" />
                   <h3 className="text-2xl font-semibold tracking-tight">
                     {feature.title}
                   </h3>

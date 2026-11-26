@@ -34,7 +34,23 @@ export default async function RootLayout({
   }
   return (
     <ClerkProvider
-      appearance={{ options: { unsafe_disableDevelopmentModeWarnings: true } }}
+      appearance={{
+        options: { unsafe_disableDevelopmentModeWarnings: true },
+        variables: {
+          colorBackground: "var(--background)",
+          colorForeground: "var(--foreground)",
+          colorPrimary: "var(--primary)",
+          colorPrimaryForeground: "var(--primary-foreground)",
+          colorMuted: "var(--muted)",
+          colorMutedForeground: "var(--muted-foreground)",
+          colorInput: "var(--background)",
+          colorInputForeground: "var(--foreground)",
+          colorNeutral: "var(--foreground)",
+          colorBorder: "var(--border)",
+          colorRing: "var(--ring)",
+          colorDanger: "var(--destructive)",
+        },
+      }}
     >
       <html
         lang="en"

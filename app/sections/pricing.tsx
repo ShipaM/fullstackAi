@@ -90,7 +90,10 @@ export default function Pricing() {
   }
 
   return (
-    <section id="pricing" className="relative overflow-hidden bg-zinc-50 py-24">
+    <section
+      id="pricing"
+      className="relative overflow-hidden bg-muted/50 py-24"
+    >
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-232 flex-col items-center space-y-4 text-center">
@@ -117,7 +120,9 @@ export default function Pricing() {
               <button
                 onClick={() => setIsAnnual(false)}
                 className={`cursor-pointer text-sm font-medium transition-colors ${
-                  !isAnnual ? "text-black" : "text-zinc-400 hover:text-zinc-500"
+                  !isAnnual
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 Monthly billing
@@ -126,11 +131,11 @@ export default function Pricing() {
                 <div className="h-6 w-10">
                   <div
                     className={`absolute inset-y-0 left-0 h-6 w-10 rounded-full transition-colors duration-200 ease-in-out ${
-                      isAnnual ? "bg-black" : "bg-zinc-200"
+                      isAnnual ? "bg-primary" : "bg-input"
                     }`}
                   />
                   <div
-                    className={`absolute left-0 inline-block h-6 w-6 transform rounded-full border border-zinc-200 bg-white shadow-lg transition-transform duration-200 ease-in-out ${
+                    className={`absolute left-0 inline-block h-6 w-6 transform rounded-full border border-border bg-background shadow-lg transition-transform duration-200 ease-in-out ${
                       isAnnual ? "translate-x-4" : "translate-x-0"
                     }`}
                     onClick={() => setIsAnnual(!isAnnual)}
@@ -140,7 +145,9 @@ export default function Pricing() {
               <button
                 onClick={() => setIsAnnual(true)}
                 className={`cursor-pointer text-sm font-medium transition-colors ${
-                  isAnnual ? "text-black" : "text-zinc-400 hover:text-zinc-500"
+                  isAnnual
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 Annual billing
@@ -150,7 +157,7 @@ export default function Pricing() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-600"
+                className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400"
               >
                 Save 17% with annual billing
               </motion.div>
@@ -168,12 +175,12 @@ export default function Pricing() {
           {plans.map((plan) => (
             <Card
               key={plan.name}
-              className={`relative flex flex-col overflow-hidden rounded-3xl border border-zinc-200 p-8 transition-all duration-300 hover:border-zinc-300 ${
-                plan.popular ? "border-2 border-black shadow-lg" : ""
+              className={`relative flex flex-col overflow-hidden rounded-3xl border border-border p-8 transition-all duration-300 hover:border-foreground/20 ${
+                plan.popular ? "border-2 border-primary shadow-lg" : ""
               }`}
             >
               {plan.popular && (
-                <div className="absolute top-7 -right-20 z-10 rotate-45 bg-black px-24 py-1 text-center text-sm font-medium text-white shadow-sm">
+                <div className="absolute top-7 -right-20 z-10 rotate-45 bg-primary px-24 py-1 text-center text-sm font-medium text-primary-foreground shadow-sm">
                   Popular
                 </div>
               )}
@@ -207,11 +214,7 @@ export default function Pricing() {
                   ))}
                 </ul>
                 <Button
-                  className={`w-full cursor-pointer ${
-                    plan.popular
-                      ? "bg-black text-white hover:bg-black/90"
-                      : "bg-white hover:bg-zinc-50"
-                  }`}
+                  className="w-full cursor-pointer"
                   variant={plan.popular ? "default" : "outline"}
                   onClick={
                     plan.name === "Pro" ? handleProSubscription : undefined

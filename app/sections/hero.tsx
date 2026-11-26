@@ -66,17 +66,7 @@ export default function Hero() {
                 elements: {
                   rootBox: "mx-auto",
                   card: "shadow-none",
-                  formButtonPrimary: "bg-black hover:bg-zinc-800",
-                  formFieldInput: "rounded-xl border-zinc-200",
-                  formFieldLabel: "text-zinc-500",
-                  headerTitle: "text-zinc-900",
-                  headerSubtitle: "text-zinc-500",
-                  socialButtonsBlockButton: "border-zinc-200 hover:bg-zinc-50",
-                  socialButtonsBlockButtonText: "text-zinc-900",
-                  dividerLine: "bg-zinc-200",
-                  dividerText: "text-zinc-400",
-                  footer: "text-zinc-400",
-                  footerActionLink: "text-zinc-900 hover:text-zinc-800",
+                  formFieldInput: "rounded-xl",
                 },
               }}
             />
@@ -84,7 +74,7 @@ export default function Hero() {
         </div>
 
         {/* Right Column - Carousel */}
-        <div className="hidden items-center justify-center bg-zinc-50 px-4 md:flex md:px-12">
+        <div className="hidden items-center justify-center bg-muted/50 px-4 md:flex md:px-12">
           <Carousel className="w-full max-w-xl">
             <CarouselContent>
               {carouselItems.map((item, index) => (
@@ -102,8 +92,8 @@ export default function Hero() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="border-zinc-200 bg-white/80 hover:bg-white" />
-            <CarouselNext className="border-zinc-200 bg-white/80 hover:bg-white" />
+            <CarouselPrevious className="border-border bg-background/80 hover:bg-background" />
+            <CarouselNext className="border-border bg-background/80 hover:bg-background" />
           </Carousel>
         </div>
       </section>

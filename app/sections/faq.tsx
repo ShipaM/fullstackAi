@@ -48,7 +48,7 @@ const faqs = [
 
 export default function FAQ() {
   return (
-    <section id="faq" className="relative overflow-hidden bg-white py-24">
+    <section id="faq" className="relative overflow-hidden bg-background py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-232 flex-col items-center space-y-4 text-center">
           <motion.h2
@@ -82,7 +82,7 @@ export default function FAQ() {
               <AccordionItem
                 key={index}
                 value={`item-${index}`}
-                className="border-b border-zinc-200 py-2 last:border-0"
+                className="border-b border-border py-2 last:border-0"
               >
                 <AccordionTrigger className="text-left text-base font-medium hover:no-underline">
                   {faq.question}
