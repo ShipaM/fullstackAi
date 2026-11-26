@@ -1,8 +1,12 @@
 import { drizzle } from "drizzle-orm/postgres-js"
 import postgres from "postgres"
-import { profilesTable } from "./schema"
+import { chatsTable, messagesTable, profilesTable } from "./schema"
 
-const schema = { profiles: profilesTable }
+const schema = {
+  profiles: profilesTable,
+  chats: chatsTable,
+  messages: messagesTable,
+}
 
 export const client = postgres(process.env.DATABASE_URL!)
 
