@@ -12,15 +12,17 @@ const relevantEvents = new Set([
   "customer.subscription.deleted",
 ])
 
-// Функция для обработки изменений в статусе подписки.
-// Извлекает из события объект подписки, получает productId из первой позиции массива items,
-// затем вызывает функцию manageSubscriptionStatusChange для обновления статуса подписки на основании полученных данных.
+// Handles subscription status changes.
+// Extracts the subscription from the event, takes the productId from the first item,
+// then calls manageSubscriptionStatusChange to update the subscription status.
 async function handleSubscriptionChange(event: Stripe.Event) {
-  // Извлечение объекта подписки из события Stripe
+  // Extract the subscription object from the Stripe event
   const subscription = event.data.object as Stripe.Subscription
-  // Получение идентификатора продукта, связанного с подпиской
+
+  // Get the product ID associated with the subscription
   const productId = subscription.items.data[0].price.product as string
-  // Обновление статуса подписки (логика в manageSubscriptionStatusChange)
+
+  // Update the subscription status (logic lives in manageSubscriptionStatusChange)
   await manageSubscriptionStatusChange(
     subscription.id,
     subscription.customer as string,
@@ -28,34 +30,35 @@ async function handleSubscriptionChange(event: Stripe.Event) {
   )
 }
 
-// Функция для обработки события "checkout.session.completed".
-// Она актуальна для сессий оформления, где mode = "subscription".
-// После успешной оплаты сохраняет данные о клиенте (обновляет данные Stripe клиента),
-// затем получает расширенную информацию о подписке и вызывает manageSubscriptionStatusChange.
+// Handles the "checkout.session.completed" event.
+// Only relevant for checkout sessions where mode = "subscription".
+// After a successful payment, stores the customer data (updates the Stripe customer),
+// then fetches the expanded subscription and calls manageSubscriptionStatusChange.
 async function handleCheckoutSession(event: Stripe.Event) {
-  // Извлечение объекта сессии из события Stripe
+  // Extract the checkout session object from the Stripe event
   const checkoutSession = event.data.object as Stripe.Checkout.Session
-  // Проверяем, что режим сессии - подписка
+
+  // Make sure the session mode is subscription
   if (checkoutSession.mode === "subscription") {
-    // Идентификатор подписки, закреплённой за сессией
+    // ID of the subscription attached to the session
     const subscriptionId = checkoutSession.subscription as string
 
-    // Обновляем данные клиента Stripe (например, привязываем клиента к подписке в нашей системе)
+    // Update the Stripe customer data (e.g. link the customer to the subscription in our system)
     await updateStripeCustomer(
       checkoutSession.client_reference_id as string,
       subscriptionId,
       checkoutSession.customer as string
     )
 
-    // Получаем данные о подписке, включая метод оплаты по умолчанию
+    // Fetch the subscription, including the default payment method
     const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
       expand: ["default_payment_method"],
     })
 
-    // Получаем идентификатор продукта, связанный с подпиской
+    // Get the product ID associated with the subscription
     const productId = subscription.items.data[0].price.product as string
 
-    // Обновляем статус подписки в нашей системе
+    // Update the subscription status in our system
     await manageSubscriptionStatusChange(
       subscription.id,
       subscription.customer as string,
@@ -65,51 +68,55 @@ async function handleCheckoutSession(event: Stripe.Event) {
 }
 
 export async function POST(req: Request) {
-  // Читаем тело запроса как текст
+  // Read the request body as text
   const body = await req.text()
-  // Получаем подпись Stripe из заголовков
+
+  // Get the Stripe signature from the headers
   const sig = (await headers()).get("Stripe-Signature") as string
-  // Секретный ключ вебхука
+
+  // Webhook signing secret
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
   let event: Stripe.Event
 
   try {
-    // Проверяем, что сигнатура и секрет доступны
+    // Make sure the signature and secret are present
     if (!sig || !webhookSecret) {
       throw new Error("Webhook secret or signature missing")
     }
 
-    // Пытаемся конструктивно воссоздать событие Stripe на основе тела запроса, подписи и секрета
+    // Construct and verify the Stripe event from the body, signature and secret
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret)
-  } catch (err: any) {
-    console.error(`Webhook Error: ${err.message}`)
-    // Возвращаем ошибку, если не удалось подтвердить событие
-    return new Response(`Webhook Error: ${err.message}`, { status: 400 })
+  } catch (err: unknown) {
+    // Narrow the unknown error to extract a safe message
+    const message = err instanceof Error ? err.message : "Unknown error"
+    console.error(`Webhook Error: ${message}`)
+    // Return an error if the event could not be verified
+    return new Response(`Webhook Error: ${message}`, { status: 400 })
   }
 
-  // Проверяем, относится ли тип события к релевантным (которые нужно обработать)
+  // Check whether the event type is one we need to handle
   if (relevantEvents.has(event.type)) {
     try {
-      // В зависимости от типа события вызываем соответствующий обработчик
+      // Dispatch to the appropriate handler based on the event type
       switch (event.type) {
         case "customer.subscription.updated":
         case "customer.subscription.deleted":
-          // Обрабатываем изменения статуса подписки
+          // Handle subscription status changes
           await handleSubscriptionChange(event)
           break
 
         case "checkout.session.completed":
-          // Обрабатываем завершённую сессию оформления (подписка)
+          // Handle a completed checkout session (subscription)
           await handleCheckoutSession(event)
           break
 
         default:
-          // Если событие релевантно, но не предусмотрен обработчик – выбрасываем ошибку
+          // Relevant event without a handler: throw an error
           throw new Error("Unhandled relevant event!")
       }
     } catch (error) {
       console.error("Webhook handler failed:", error)
-      // Возвращаем ошибку, если что-то пошло не так при обработке события
+      // Return an error if something went wrong while handling the event
       return new Response(
         "Webhook handler failed. View your nextjs function logs.",
         {
@@ -119,6 +126,6 @@ export async function POST(req: Request) {
     }
   }
 
-  // Возвращаем успешный ответ, если событие принято и обработано (или не требует обработки)
+  // Return a success response once the event is received and handled (or needs no handling)
   return new Response(JSON.stringify({ received: true }))
 }

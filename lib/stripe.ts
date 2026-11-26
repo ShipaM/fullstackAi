@@ -1,14 +1,15 @@
 import Stripe from "stripe"
-// Импортируем класс Stripe из пакета "stripe"
 
+// Create a Stripe client instance using the secret key from environment variables
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  // Создаём экземпляр клиента Stripe, используя секретный ключ из переменных окружения
+  // Pin the Stripe API version so behavior matches the expected API version
   apiVersion: "2026-11-18.endive",
-  // Указываем версию API Stripe, чтобы быть уверенными, что функциональность соответствует ожидаемой версии API
+
   appInfo: {
+    // Name of the application using Stripe
     name: "Todo App",
-    // Указываем имя приложения, которое использует Stripe
+
+    // Current version of the application
     version: "0.1.0",
-    // Указываем текущую версию приложения
   },
 })

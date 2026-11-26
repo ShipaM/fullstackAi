@@ -9,10 +9,10 @@ import Stripe from "stripe"
 type MembershipStatus = SelectProfile["membership"]
 
 /**
- * Функция, определяющая статус членства пользователя на основе статуса подписки.
- * Если подписка активна или находится на пробном периоде, возвращается текущий статус членства.
- * Если подписка отменена или имеет любой проблемный статус (неполная, просроченная и т.д.),
- * статус членства переводится на "free".
+ * Determines the user's membership status based on the subscription status.
+ * If the subscription is active or trialing, the current membership status is returned.
+ * If the subscription is canceled or in any problematic state (incomplete, past due, etc.),
+ * the membership status is set to "free".
  */
 const getMembershipStatus = (
   status: Stripe.Subscription.Status,
@@ -21,7 +21,7 @@ const getMembershipStatus = (
   switch (status) {
     case "active":
     case "trialing":
-      // Если подписка активна или идет пробный период, оставляем текущий статус членства.
+      // Subscription is active or trialing: keep the current membership status.
       return membership
     case "canceled":
     case "incomplete":
@@ -29,17 +29,17 @@ const getMembershipStatus = (
     case "past_due":
     case "paused":
     case "unpaid":
-      // Если подписка отменена или возникает проблема с оплатой, статус членства "free".
+      // Subscription is canceled or has a payment problem: membership becomes "free".
       return "free"
     default:
-      // На случай неизвестного статуса — по умолчанию "free".
+      // Unknown status: default to "free".
       return "free"
   }
 }
 
 /**
- * Получение информации о подписке из Stripe по ее ID.
- * Расширение ответа для получения информации о способе оплаты по умолчанию.
+ * Retrieves a subscription from Stripe by its ID.
+ * Expands the response to include the default payment method.
  */
 const getSubscription = async (subscriptionId: string) => {
   return stripe.subscriptions.retrieve(subscriptionId, {
@@ -48,8 +48,8 @@ const getSubscription = async (subscriptionId: string) => {
 }
 
 /**
- * Обновление информации о пользователе на основе данных из Stripe.
- * Здесь обновляются записи в профиле пользователя, включая ID клиента и ID подписки Stripe.
+ * Updates the user's profile with data from Stripe.
+ * Stores the Stripe customer ID and subscription ID on the user's profile.
  */
 export const updateStripeCustomer = async (
   userId: string,
@@ -57,15 +57,15 @@ export const updateStripeCustomer = async (
   customerId: string
 ) => {
   try {
-    // Проверяем, переданы ли все необходимые параметры.
+    // Ensure all required parameters are provided.
     if (!userId || !subscriptionId || !customerId) {
       throw new Error("Missing required parameters for updateStripeCustomer")
     }
 
-    // Получаем информацию о подписке из Stripe.
+    // Fetch the subscription from Stripe.
     const subscription = await getSubscription(subscriptionId)
 
-    // Обновляем профиль пользователя, записывая идентификаторы Stripe-клиента и подписки.
+    // Update the user's profile with the Stripe customer and subscription IDs.
     const updatedProfile = await updateProfileByUserId(userId, {
       stripeCustomerId: customerId,
       stripeSubscriptionId: subscription.id,
@@ -75,7 +75,7 @@ export const updateStripeCustomer = async (
       throw new Error("Failed to update customer profile")
     }
 
-    // Возвращаем обновленную запись профиля.
+    // Return the updated profile record.
     return updatedProfile
   } catch (error) {
     console.error("Error in updateStripeCustomer:", error)
@@ -86,10 +86,10 @@ export const updateStripeCustomer = async (
 }
 
 /**
- * Обработка изменения статуса подписки.
- * Получаем информацию о подписке и продукте из Stripe, определяем членство (продукт должен содержать
- * соответствующий метаданные membership: "free" или "pro").
- * На основе статуса подписки изменяем статус членства профиля в базе данных.
+ * Handles a subscription status change.
+ * Fetches the subscription and product from Stripe and determines the membership
+ * (the product must have a "membership" metadata value of "free" or "pro").
+ * Updates the profile's membership status in the database based on the subscription status.
  */
 export const manageSubscriptionStatusChange = async (
   subscriptionId: string,
@@ -97,40 +97,40 @@ export const manageSubscriptionStatusChange = async (
   productId: string
 ): Promise<MembershipStatus> => {
   try {
-    // Проверяем наличие всех необходимых параметров.
+    // Ensure all required parameters are provided.
     if (!subscriptionId || !customerId || !productId) {
       throw new Error(
         "Missing required parameters for manageSubscriptionStatusChange"
       )
     }
 
-    // Получаем подписку.
+    // Fetch the subscription.
     const subscription = await getSubscription(subscriptionId)
 
-    // Получаем продукт по его ID для определения типа членства из метаданных.
+    // Fetch the product by ID to read the membership type from its metadata.
     const product = await stripe.products.retrieve(productId)
     const membership = product.metadata.membership as MembershipStatus
 
-    // Проверяем корректность полученного типа членства.
+    // Validate the membership type.
     if (!["free", "pro"].includes(membership)) {
       throw new Error(
         `Invalid membership type in product metadata: ${membership}`
       )
     }
 
-    // Определяем статус членства на основе статуса подписки.
+    // Determine the membership status from the subscription status.
     const membershipStatus = getMembershipStatus(
       subscription.status,
       membership
     )
 
-    // Обновляем профиль пользователя, присваивая ему новый статус членства в соответствии с подпиской.
+    // Update the user's profile with the new membership status.
     await updateProfileByStripeCustomerId(customerId, {
       stripeSubscriptionId: subscription.id,
       membership: membershipStatus,
     })
 
-    // Возвращаем финальный статус членства.
+    // Return the resulting membership status.
     return membershipStatus
   } catch (error) {
     console.error("Error in manageSubscriptionStatusChange:", error)
