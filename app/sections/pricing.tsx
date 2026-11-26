@@ -2,6 +2,12 @@
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { useUser } from "@clerk/nextjs"
 import { motion } from "framer-motion"
 import { Check } from "lucide-react"
@@ -95,6 +101,9 @@ export default function Pricing() {
   const { user } = useUser()
 
   const handleProSubscription = () => {
+    // Never send the user to Stripe without an ID to link the subscription to
+    if (!user) return
+
     const baseUrl = isAnnual
       ? process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_YEARLY
       : process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_MONTHLY
@@ -105,7 +114,7 @@ export default function Pricing() {
     }
 
     // Append client_reference_id to the URL
-    const paymentUrl = `${baseUrl}?client_reference_id=${user?.id}`
+    const paymentUrl = `${baseUrl}?client_reference_id=${user.id}`
     window.location.href = paymentUrl
   }
 
@@ -233,15 +242,37 @@ export default function Pricing() {
                       </li>
                     ))}
                   </ul>
-                  <Button
-                    className="w-full cursor-pointer"
-                    variant={plan.popular ? "default" : "outline"}
-                    onClick={
-                      plan.name === "Pro" ? handleProSubscription : undefined
-                    }
-                  >
-                    {plan.cta}
-                  </Button>
+                  {plan.name === "Pro" && !user ? (
+                    // Disabled buttons don't emit pointer events, so the span acts as the tooltip trigger
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span tabIndex={0} className="w-full">
+                            <Button
+                              className="w-full"
+                              variant={plan.popular ? "default" : "outline"}
+                              disabled
+                            >
+                              {plan.cta}
+                            </Button>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Please sign in to subscribe
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  ) : (
+                    <Button
+                      className="w-full cursor-pointer"
+                      variant={plan.popular ? "default" : "outline"}
+                      onClick={
+                        plan.name === "Pro" ? handleProSubscription : undefined
+                      }
+                    >
+                      {plan.cta}
+                    </Button>
+                  )}
                 </div>
               </Card>
             </motion.div>
